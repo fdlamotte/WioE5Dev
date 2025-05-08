@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "HardwareSerial.h"
 
-#include <LittleFS_Config.h>
+#include <InternalFileSystem.h>
 
 using namespace Adafruit_LittleFS_Namespace;
 
@@ -10,7 +10,7 @@ unsigned long last_millis {0};
 bool state {true};
 static constexpr unsigned long blink_duration {1000};
 
-Adafruit_LittleFS fs;
+Adafruit_LittleFS *fs = &InternalFS;
 
 void setup(void)
 {
@@ -22,17 +22,11 @@ void setup(void)
     pinMode(PB5, OUTPUT);
     mySerial.println(F("Booted!"));
 
-    if (!(fs_ok = fs.begin(&_InternalFSConfig))) {
-        Serial.println("Format flash");
-        fs.format();
-        if (!(fs_ok = fs.begin(&_InternalFSConfig))){
-            Serial.println("Couldn't init flash");
-        }
-    }
+    fs_ok = fs->begin();
 
     if (fs_ok) {
         int ret;
-        File file = fs.open("/counter");
+        File file = fs->open("/counter");
         if (file) {
             uint32_t val;
             if (ret = file.read(&val, sizeof(val)))
@@ -42,7 +36,7 @@ void setup(void)
         }
         boot_cpt ++;
         Serial.printf("Boot counter : %d\r\n", boot_cpt);
-        file = fs.open("counter", FILE_O_WRITE);
+        file = fs->open("counter", FILE_O_WRITE);
         if (file) {
             file.seek(0);
             file.truncate();
