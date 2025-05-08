@@ -9,7 +9,7 @@ RADIO_CLASS radio = new STM32WLx_Module();
 
 WRAPPER_CLASS radio_driver(radio, board);
 
-static const uint32_t rfswitch_pins[] = {PA4,  PA5,  RADIOLIB_NC};
+static const uint32_t rfswitch_pins[] = {PA4,  PA5,  RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC};
 static const Module::RfSwitchMode_t rfswitch_table[] = {
   {STM32WLx::MODE_IDLE,  {LOW,  LOW}},
   {STM32WLx::MODE_RX,    {HIGH, LOW}},
@@ -36,7 +36,7 @@ bool radio_init() {
 
   radio.setRfSwitchTable(rfswitch_pins, rfswitch_table);
 
-  int status = radio.begin(LORA_FREQ, LORA_BW, LORA_SF, LORA_CR, RADIOLIB_SX126X_SYNC_WORD_PRIVATE, LORA_TX_POWER, 8, tcxo);
+  int status = radio.begin(LORA_FREQ, LORA_BW, LORA_SF, LORA_CR, RADIOLIB_SX126X_SYNC_WORD_PRIVATE, LORA_TX_POWER, 8, 1.7, 0);
 
   if (status != RADIOLIB_ERR_NONE) {
     Serial.print("ERROR: radio init failed: ");
